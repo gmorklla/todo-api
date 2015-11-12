@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var _ = require('underscore');
 
 var app = express();
-var PORT = process.env.PORT || 5000;
+var PORT = process.env.PORT || 3000;
 var todos = [];
 var todoNextId = 1;
 
@@ -36,12 +36,13 @@ app.get('/todos/:id', function (req, res) {
 // POST /todos
 
 app.post('/todos', function (req, res) {
-	var body = req.body;
+	var body = _.pick(req.body, 'completada', 'description');
 
 	if( !_.isBoolean(body.completada) || !_.isString(body.description) || body.description.trim().length === 0 ){
 		return res.status(400).send();
 	}
 
+	body.description = body.description.trim();
 	body.id = todoNextId;
 
 	todos.push(body);
