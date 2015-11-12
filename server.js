@@ -14,13 +14,11 @@ app.get('/', function (req, res) {
 });
 
 // GET /todos
-
 app.get('/todos', function (req, res) {
 	res.json(todos);
 });
 
 // GET /todos/:id
-
 app.get('/todos/:id', function (req, res) {
 	var todoId = parseInt(req.params.id, 10);
 	var matchedTodo = _.findWhere(todos, {id: todoId});
@@ -34,7 +32,6 @@ app.get('/todos/:id', function (req, res) {
 });
 
 // POST /todos
-
 app.post('/todos', function (req, res) {
 	var body = _.pick(req.body, 'completada', 'description');
 
@@ -50,6 +47,19 @@ app.post('/todos', function (req, res) {
 	res.json(body);
 
 	todoNextId++;
+});
+
+// DELETE /todos/:id
+app.delete('/todos/:id', function (req, res) {
+	var todoId = parseInt(req.params.id, 10);
+	var matchedTodo = _.findWhere(todos, {id: todoId});
+
+	if(matchedTodo){
+		todos = _.without(todos, matchedTodo);
+		res.json(matchedTodo);
+	} else {
+		res.status(404).json({"Error": "No hay tarea con ese id"});
+	}	
 });
 
 app.listen(PORT, function () {
