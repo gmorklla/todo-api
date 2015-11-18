@@ -16,26 +16,28 @@ app.get('/', function(req, res) {
 
 // GET /todos?completada=true&q=perro
 app.get('/todos', function(req, res) {
-	var queryParams = req.query;
-	var filteredTodos = todos;
+	var query = req.query;
+	var where = {};
 
-	if (queryParams.hasOwnProperty('completada') && queryParams.completada === 'true') {
-		filteredTodos = _.where(filteredTodos, {
-			completada: true
-		});
-	} else if (queryParams.hasOwnProperty('completada') && queryParams.completada === 'false') {
-		filteredTodos = _.where(filteredTodos, {
-			completada: false
-		});
+	if (query.hasOwnProperty('completada') && query.completada === 'true') {
+		where.completada = true;
+	} else if (query.hasOwnProperty('completada') && query.completada === 'false') {
+		where.completada = false;
 	}
 
-	if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
-		filteredTodos = _.filter(filteredTodos, function(todo) {
-			return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
-		});
+	if (query.hasOwnProperty('q') && query.q.length > 0) {
+		where.description = {
+			$like: '%' + query.q + '%'
+		}
 	}
 
-	res.json(filteredTodos);
+	db.todo.findAll({
+		where: where
+	}).then(function(todos) {
+		res.json(todos);
+	}, function(e) {
+		res.status(500).send();
+	});
 });
 
 // GET /todos/:id
@@ -48,9 +50,9 @@ app.get('/todos/:id', function(req, res) {
 		} else {
 			res.status(404).json({
 				"Error": "No hay TODO con ese id"
-			});			
+			});
 		}
-	}, function (e) {
+	}, function(e) {
 		res.status(500).send();
 	});
 });
