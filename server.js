@@ -9,23 +9,27 @@ var todoNextId = 1;
 
 app.use(bodyParser.json());
 
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
 	res.send('TODO API Root');
 });
 
 // GET /todos?completada=true&q=perro
-app.get('/todos', function (req, res) {
+app.get('/todos', function(req, res) {
 	var queryParams = req.query;
 	var filteredTodos = todos;
 
-	if(queryParams.hasOwnProperty('completada') && queryParams.completada === 'true') {
-		filteredTodos = _.where(filteredTodos, {completada: true});
+	if (queryParams.hasOwnProperty('completada') && queryParams.completada === 'true') {
+		filteredTodos = _.where(filteredTodos, {
+			completada: true
+		});
 	} else if (queryParams.hasOwnProperty('completada') && queryParams.completada === 'false') {
-		filteredTodos = _.where(filteredTodos, {completada: false});
+		filteredTodos = _.where(filteredTodos, {
+			completada: false
+		});
 	}
 
-	if(queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
-		filteredTodos = _.filter(filteredTodos, function (todo) {
+	if (queryParams.hasOwnProperty('q') && queryParams.q.length > 0) {
+		filteredTodos = _.filter(filteredTodos, function(todo) {
 			return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
 		});
 	}
@@ -34,11 +38,13 @@ app.get('/todos', function (req, res) {
 });
 
 // GET /todos/:id
-app.get('/todos/:id', function (req, res) {
+app.get('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-	var matchedTodo = _.findWhere(todos, {id: todoId});
+	var matchedTodo = _.findWhere(todos, {
+		id: todoId
+	});
 
-	if(matchedTodo){
+	if (matchedTodo) {
 		res.json(matchedTodo);
 	} else {
 		res.status(404).send();
@@ -47,10 +53,10 @@ app.get('/todos/:id', function (req, res) {
 });
 
 // POST /todos
-app.post('/todos', function (req, res) {
+app.post('/todos', function(req, res) {
 	var body = _.pick(req.body, 'completada', 'description');
 
-	if( !_.isBoolean(body.completada) || !_.isString(body.description) || body.description.trim().length === 0 ){
+	if (!_.isBoolean(body.completada) || !_.isString(body.description) || body.description.trim().length === 0) {
 		return res.status(400).send();
 	}
 
@@ -58,45 +64,51 @@ app.post('/todos', function (req, res) {
 	body.id = todoNextId;
 
 	todos.push(body);
-	
+
 	res.json(body);
 
 	todoNextId++;
 });
 
 // DELETE /todos/:id
-app.delete('/todos/:id', function (req, res) {
+app.delete('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-	var matchedTodo = _.findWhere(todos, {id: todoId});
+	var matchedTodo = _.findWhere(todos, {
+		id: todoId
+	});
 
-	if(matchedTodo){
+	if (matchedTodo) {
 		todos = _.without(todos, matchedTodo);
 		res.json(matchedTodo);
 	} else {
-		res.status(404).json({"Error": "No hay tarea con ese id"});
-	}	
+		res.status(404).json({
+			"Error": "No hay tarea con ese id"
+		});
+	}
 });
 
 // PUT /todos/:id
-app.put('/todos/:id', function (req, res) {
+app.put('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-	var matchedTodo = _.findWhere(todos, {id: todoId});	
+	var matchedTodo = _.findWhere(todos, {
+		id: todoId
+	});
 	var body = _.pick(req.body, 'completada', 'description');
 	var atributosValidos = {};
 
-	if(!matchedTodo) {
+	if (!matchedTodo) {
 		return res.status(404).send();
 	}
 
-	if(body.hasOwnProperty('completada') && _.isBoolean(body.completada)) {
+	if (body.hasOwnProperty('completada') && _.isBoolean(body.completada)) {
 		atributosValidos.completada = body.completada;
-	} else if(body.hasOwnProperty('completada')){
+	} else if (body.hasOwnProperty('completada')) {
 		return res.status(400).send();
 	}
 
-	if(body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0) {
+	if (body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0) {
 		atributosValidos.description = body.description;
-	} else if(body.hasOwnProperty('description')){
+	} else if (body.hasOwnProperty('description')) {
 		return res.status(400).send();
 	}
 
@@ -105,6 +117,6 @@ app.put('/todos/:id', function (req, res) {
 
 });
 
-app.listen(PORT, function () {
+app.listen(PORT, function() {
 	console.log('Express listening on port ' + PORT + '!');
 });
