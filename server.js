@@ -72,18 +72,22 @@ app.post('/todos', function(req, res) {
 // DELETE /todos/:id
 app.delete('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-	var matchedTodo = _.findWhere(todos, {
-		id: todoId
-	});
 
-	if (matchedTodo) {
-		todos = _.without(todos, matchedTodo);
-		res.json(matchedTodo);
-	} else {
-		res.status(404).json({
-			"Error": "No hay tarea con ese id"
-		});
-	}
+	db.todo.destroy({
+		where: {
+			id: todoId
+		}
+	}).then(function(rowsDeleted) {
+		if (rowsDeleted === 0) {
+			res.status(404).json({
+				"Error": "No hay tarea con ese id"
+			});
+		} else {
+			res.status(204).send();
+		}
+	}, function(e) {
+		res.status(500).send();
+	});
 });
 
 // PUT /todos/:id
