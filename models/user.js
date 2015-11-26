@@ -21,7 +21,7 @@ module.exports = function (sequelize, DataTypes) {
 			type: DataTypes.VIRTUAL,
 			allowNull: false,
 			validate: {
-				len: [8, 100]
+				len: [8, 10]
 			},
 			set: function (value) {
 				var salt = bcrypt.genSaltSync(10);
